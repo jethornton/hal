@@ -18,8 +18,10 @@ class TestWidget(QWidget):
 		super().__init__()
 		self.halcomp = hal.component('mytest')
 		self.halcomp.newpin('out', hal.HAL_BIT, hal.HAL_OUT)
+		self.halcomp.newpin('out2', hal.HAL_BIT, hal.HAL_OUT)
 		self.halcomp.newpin('in', hal.HAL_BIT, hal.HAL_IN)
 		self.halcomp.newpin('value', hal.HAL_U32, hal.HAL_IN)
+		self.halcomp.newpin('set_value', hal.HAL_U32, hal.HAL_IN)
 		self.halcomp.ready()
 
 		self.setWindowTitle('Test Widget')
@@ -39,14 +41,38 @@ class TestWidget(QWidget):
 		self.number_in = QSpinBox()
 		self.number_in.valueChanged.connect(lambda: hal.set_p('mytest.value', f'{self.number_in.value()}'))
 
+		self.set_value = QPushButton('Set Value')
+		self.set_value.setCheckable(True)
+		self.set_value.clicked.connect(self.set_pin)
+
 		self.layout.addWidget(self.test_out)
 		self.layout.addWidget(self.test_in)
 		self.layout.addWidget(self.number_in)
+		self.layout.addWidget(self.set_value)
 
 		self.test_hal = QPushButton('Test HAL')
 		self.test_hal.clicked.connect(lambda: hal.set_p('halui.mode.teleop', "true"))
 		self.layout.addWidget(self.test_hal)
 		self.show()
+
+		'''
+		usually something like this:
+		button.clicked.connect(my_function)
+
+		def my_function(state):
+		print(state)
+		if state:
+		parent.hal_test.out.set(10)
+		else:
+		parent.hal_test.out.set(0)
+		'''
+
+	def set_pin(self, state):
+		print(state)
+		if state:
+			self.halcomp.out2.set(10)
+		else:
+			self.halcomp.out2.set(0)
 
 	def set_out_pin(self, data):
 		self.halcomp['out'] = data
