@@ -4,6 +4,8 @@ from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton
 from PyQt6.QtWidgets import QSpinBox
 import hal, linuxcnc
 
+#### if the program crashes while your experimenting run halrun -U to unload hal
+
 '''
 HAL_BIT
 HAL_FLOAT
@@ -18,7 +20,7 @@ class TestWidget(QWidget):
 		super().__init__()
 		self.halcomp = hal.component('mytest')
 		self.halcomp.newpin('out', hal.HAL_BIT, hal.HAL_OUT)
-		self.halcomp.newpin('out2', hal.HAL_BIT, hal.HAL_OUT)
+		self.out2 = self.halcomp.newpin('out2', hal.HAL_BIT, hal.HAL_OUT)
 		self.halcomp.newpin('in', hal.HAL_BIT, hal.HAL_IN)
 		self.halcomp.newpin('value', hal.HAL_U32, hal.HAL_IN)
 		self.halcomp.newpin('set_value', hal.HAL_U32, hal.HAL_IN)
@@ -51,7 +53,9 @@ class TestWidget(QWidget):
 		self.layout.addWidget(self.set_value)
 
 		self.test_hal = QPushButton('Test HAL')
-		self.test_hal.clicked.connect(lambda: hal.set_p('halui.mode.teleop', "true"))
+		self.test_hal.setCheckable(True)
+		self.test_hal.toggled.connect(lambda: self.out2.set(self.test_hal.isChecked()))
+		#self.test_hal.released.connect(lambda: self.out2.set(False))
 		self.layout.addWidget(self.test_hal)
 		self.show()
 
@@ -70,9 +74,9 @@ class TestWidget(QWidget):
 	def set_pin(self, state):
 		print(state)
 		if state:
-			self.halcomp.out2.set(10)
+			self.halcomp['set_value'] = 10
 		else:
-			self.halcomp.out2.set(0)
+			self.halcomp['set_value'] = 0
 
 	def set_out_pin(self, data):
 		self.halcomp['out'] = data
@@ -81,6 +85,7 @@ class TestWidget(QWidget):
 		self.halcomp['in'] = data
 
 	def closeEvent(self, event):
+		print('by by')
 		event.accept()
 		self.halcomp.exit()
 
