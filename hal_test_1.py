@@ -21,6 +21,7 @@ class TestWidget(QWidget):
 		self.halcomp = hal.component('mytest')
 		self.halcomp.newpin('out', hal.HAL_BIT, hal.HAL_OUT)
 		self.out2 = self.halcomp.newpin('out2', hal.HAL_BIT, hal.HAL_OUT)
+		print(self.out2)
 		self.halcomp.newpin('in', hal.HAL_BIT, hal.HAL_IN)
 		self.halcomp.newpin('value', hal.HAL_U32, hal.HAL_IN)
 		self.halcomp.newpin('set_value', hal.HAL_U32, hal.HAL_IN)
